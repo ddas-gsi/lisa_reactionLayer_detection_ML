@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # Load your model
-model = joblib.load("models/best_model.joblib")
+model = joblib.load("best_hgb_model.joblib")
 
 # Define the input data format
 class InputData(BaseModel):
