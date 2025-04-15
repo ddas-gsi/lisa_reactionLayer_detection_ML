@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+# *.py[cod]
+# *$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter Notebook checkpoints (if any)
+.ipynb_checkpoints
+
+# VSCode / PyCharm settings
+.vscode/
+.idea/
+
+# macOS stuff
+.DS_Store
+
+# Logs
+*.log
+
+# Python test cache
+.pytest_cache/
+
+# Model files (optional — keep if you want to version control models)
+# *.joblib
+# *.pkl
+# *.h5
+
+# Streamlit specific
+.streamlit/config.toml
+
+# Docker stuff
+*.tar
+docker-compose.override.yml
+
+# Environment files
+.env
+.env.*
+
+# Pip stuff
+pip-wheel-metadata/
+*.egg-info/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# Mypy
+.mypy_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg
+*.manifest
+*.spec
+
+# PyInstaller
+*.spec
+
+# FastAPI/uvicorn reload temp
+**/__pycache__/
+**/*.pyc
