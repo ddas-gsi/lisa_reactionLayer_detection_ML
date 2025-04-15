@@ -10,8 +10,8 @@ Run procedure:
 	
 Then visit:
 
-http://localhost:8501 → Streamlit dashboard
-http://localhost:8000/docs → FastAPI API docs
+	http://localhost:8501 → Streamlit dashboard
+	http://localhost:8000/docs → FastAPI API docs
 
 
 
