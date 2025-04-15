@@ -1,6 +1,15 @@
 This is Machine Learning algorithm pipeline for reaction layer detection of LISA Diamond detector 
 
-Run procedure:
+Basic Run Procedure:
+
+-> Inside lisa_reactionLayer_detection_ML/
+	
+	>> pip install -r requirements.txt
+    >> uvicorn backend:app --reload
+	>> streamlit run dashboard.py
+
+
+Docker Run procedure:
 
 -> Inside lisa_reactionLayer_detection_ML/
 	
