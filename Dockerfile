@@ -1,19 +1,22 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Use the official Python image
+FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-# COPY ../models/best_hgb_model.joblib /app/
+# Copy your code into the container
+COPY . .
 
+# Install dependencies
+RUN pip install --upgrade pip
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose the port the app runs on
+# Expose ports:
+# 8000 for FastAPI
+# 8501 for Streamlit
 EXPOSE 8000
+EXPOSE 8501
 
-# Run the application when the container launches
-CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start both FastAPI and Streamlit using a shell script
+CMD ["bash", "-c", "uvicorn backend:app --host 0.0.0.0 --port 8000 & streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0"]
