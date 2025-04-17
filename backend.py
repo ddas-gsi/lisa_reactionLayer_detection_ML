@@ -1,3 +1,5 @@
+# backend for batch mode processing
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -5,6 +7,7 @@ import joblib
 import numpy as np
 import logging
 import pandas as pd
+from typing import List
 
 app = FastAPI()
 
@@ -34,17 +37,20 @@ class InputData(BaseModel):
     x2: float
     x3: float
 
-@app.post("/predict")
-def predict(data: InputData):
-    logging.info(f"Received input: dE_L0={data.x1}, dE_L1={data.x2}, dE_Tot={data.x3}")
-    
-    # Use correct feature names here
-    input_df = pd.DataFrame([{
-        "dE_L0": data.x1,
-        "dE_L1": data.x2,
-        "dE_Tot": data.x3
-    }])
+class InputBatch(BaseModel):
+    data: List[InputData]
 
-    prediction = model.predict(input_df)
-    logging.info(f"Prediction result: {prediction[0]}")
-    return {"prediction": prediction[0]}
+@app.post("/predict_batch")
+def predict_batch(batch: InputBatch):
+    df = pd.DataFrame([{
+        "dE_L0": item.x1,
+        "dE_L1": item.x2,
+        "dE_Tot": item.x3
+    } for item in batch.data])
+
+    logging.info(f"Received batch of size: {len(df)}")
+
+    predictions = model.predict(df)
+    logging.info(f"Batch predictions: {predictions.tolist()}")
+
+    return {"predictions": predictions.tolist()}

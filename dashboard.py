@@ -1,38 +1,61 @@
+# Streamlit dashboard to visualize the batch mode predictions of the model in real-time.
+
 import streamlit as st
-import requests
+import pandas as pd
+import plotly.express as px
+import json
+import time
+import os
 
-st.title("Reaction Layer Prediction")
+st.set_page_config(page_title="Live Reaction Layer Monitor", layout="wide")
+st.title("Live Reaction Layer Prediction")
 
-x1 = st.number_input("dE_L0", value=0.0)
-x2 = st.number_input("dE_L1", value=0.0)
-# x3 = st.number_input("Input x3", value=0.0)
-x3 = x1 + x2  # derived feature
-st.write(f"dE_Total: {x3}")
+# Pause/Continue toggle
+paused = st.checkbox("Pause live updates", value=False)
 
+# Reset button
+if st.button("Reset Histogram"):
+    if os.path.exists("latest_batch.json"):
+        os.remove("latest_batch.json")
+        st.success("Histograms reset!")
+    else:
+        st.warning("No histogram data to reset.")
+    st.stop()
 
-if st.button("Get Reaction Layer"):
-    st.write("Fetching prediction from the server...")
-    try:
-        response = requests.post("http://localhost:8000/predict", json={    # Replace with the actual URL of the server
-            "x1": x1,
-            "x2": x2,
-            "x3": x3
-        })
-        response.raise_for_status()  # raises an error for non-200 codes
-        result = response.json()
-        # st.success(f"Prediction: {result['prediction']}")
-        if result['prediction'] == 0:
-            st.success("Reaction Layer >> 1")
-        elif result['prediction'] == 1:
-            st.success("Reaction Layer >> 2")
-        elif result['prediction'] == 999:
-            st.success("No Reaction")
+# Placeholder to update plots live
+placeholder = st.empty()
 
-    except requests.exceptions.RequestException as e:
-        st.error(f"Request failed: {e}")
-        st.text(f"Raw response: {response.text}")
-    except ValueError as e:
-        st.error("Could not decode JSON response")
-        st.text(f"Raw response: {response.text}")
+# Main loop
+while True:
+    if not paused:
+        try:
+            with open("latest_batch.json", "r") as f:
+                data = json.load(f)
+                df = pd.DataFrame(data)
+                df["Layer"] = df["prediction"].map({0: "Layer 1", 1: "Layer 2", 999: "No Reaction"})
 
+                with placeholder.container():
+                    st.subheader("Live Histogram of Predicted Layers")
+                    fig = px.histogram(df, x="Layer", color="Layer", nbins=3, title="Layer Distribution (Updated every second)")
+                    st.plotly_chart(fig, use_container_width=True)
 
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        fig_l0 = px.histogram(df, x="x1", color="Layer", title="dE_L0 Distribution", nbins=30)
+                        st.plotly_chart(fig_l0, use_container_width=True)
+
+                    with col2:
+                        fig_l1 = px.histogram(df, x="x2", color="Layer", title="dE_L1 Distribution", nbins=30)
+                        st.plotly_chart(fig_l1, use_container_width=True)
+
+                    fig_tot = px.histogram(df, x="x3", color="Layer", title="dE_Tot Distribution", nbins=30)
+                    st.plotly_chart(fig_tot, use_container_width=True)
+
+        except FileNotFoundError:
+            st.warning("Waiting for data from randomEnergy generator...")
+
+    else:
+        st.info("Live updates are paused.")
+
+    time.sleep(1)

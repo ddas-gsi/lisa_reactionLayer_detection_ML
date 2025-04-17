@@ -8,6 +8,10 @@ Basic Run Procedure:
     >> uvicorn backend:app --reload
 	>> streamlit run dashboard.py
 
+or if noraml streamlit doesn't work:
+
+	>> python -m streamlit run dashboard.py
+
 
 Docker Run procedure:
 
