@@ -1,30 +1,20 @@
-# This script generates random samples of energy data and sends them to a backend service for prediction.
+# Dump random Energy data to a websocket server
 
-import requests
+import asyncio
+import websockets
+import json
 import random
-import time
 
-BACKEND_URL = "http://localhost:8000/predict_batch"
+async def send_data():
+    uri = "ws://localhost:8000/ws/predict"
+    async with websockets.connect(uri) as websocket:
+        while True:
+            batch = [{"x1": random.uniform(0, 10), "x2": random.uniform(0, 10)} for _ in range(100)]
+            await websocket.send(json.dumps(batch))
+            response = await websocket.recv()
+            with open("latest_batch.json", "w") as f:
+                f.write(response)
+            await asyncio.sleep(1)
 
-def generate_random_sample():
-    dE_L0 = random.uniform(910.0, 1025.0)    # random.uniform(lowerLimit, upperLimit)
-    dE_L1 = random.uniform(925.0, 1035.0)    # random.uniform(lowerLimit, upperLimit)
-    dE_Tot = dE_L0 + dE_L1
-    return {"x1": dE_L0, "x2": dE_L1, "x3": dE_Tot}
-
-while True:
-    batch = [generate_random_sample() for _ in range(100)]
-    try:
-        response = requests.post(BACKEND_URL, json={"data": batch})
-        result = response.json()
-
-        # Save batch with predictions to file (or database, Redis, etc.)
-        with open("latest_batch.json", "w") as f:
-            import json
-            for i, sample in enumerate(batch):
-                sample["prediction"] = result["predictions"][i]
-            json.dump(batch, f)
-    except Exception as e:
-        print("Error:", e)
-    
-    time.sleep(2)  # Wait 2 second before generating the next batch
+if __name__ == "__main__":
+    asyncio.run(send_data())

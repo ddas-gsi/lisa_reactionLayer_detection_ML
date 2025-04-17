@@ -1,61 +1,71 @@
-# Streamlit dashboard to visualize the batch mode predictions of the model in real-time.
+# Streamlit dashboard to visualize the batch mode predictions of the model in real-time with websocket
 
 import streamlit as st
+import asyncio
 import pandas as pd
 import plotly.express as px
 import json
-import time
-import os
+import websockets
 
-st.set_page_config(page_title="Live Reaction Layer Monitor", layout="wide")
-st.title("Live Reaction Layer Prediction")
+st.set_page_config(page_title="Live Layer Prediction", layout="wide")
+st.title("🧪 Real-Time Reaction Layer Monitor")
 
-# Pause/Continue toggle
-paused = st.checkbox("Pause live updates", value=False)
+# Streamlit session state
+if "paused" not in st.session_state:
+    st.session_state.paused = False
+if "latest_df" not in st.session_state:
+    st.session_state.latest_df = pd.DataFrame()
 
-# Reset button
-if st.button("Reset Histogram"):
-    if os.path.exists("latest_batch.json"):
-        os.remove("latest_batch.json")
+# Controls
+col1, col2 = st.columns([1, 3])
+with col1:
+    if st.button("⏸️ Pause" if not st.session_state.paused else "▶️ Resume"):
+        st.session_state.paused = not st.session_state.paused
+
+with col2:
+    if st.button("🔁 Reset Histogram"):
+        st.session_state.latest_df = pd.DataFrame()
         st.success("Histograms reset!")
-    else:
-        st.warning("No histogram data to reset.")
-    st.stop()
 
-# Placeholder to update plots live
+# Live plot area
 placeholder = st.empty()
 
-# Main loop
-while True:
-    if not paused:
-        try:
-            with open("latest_batch.json", "r") as f:
-                data = json.load(f)
-                df = pd.DataFrame(data)
-                df["Layer"] = df["prediction"].map({0: "Layer 1", 1: "Layer 2", 999: "No Reaction"})
+async def listen_to_websocket():
+    uri = "ws://localhost:8000/ws/predict"
+    async with websockets.connect(uri) as websocket:
+        while True:
+            if not st.session_state.paused:
+                try:
+                    message = await websocket.recv()
+                    data = json.loads(message)
+                    df = pd.DataFrame(data)
+                    df["Layer"] = df["prediction"].map({0: "Layer 1", 1: "Layer 2", 999: "No Reaction"})
 
-                with placeholder.container():
-                    st.subheader("Live Histogram of Predicted Layers")
-                    fig = px.histogram(df, x="Layer", color="Layer", nbins=3, title="Layer Distribution (Updated every second)")
-                    st.plotly_chart(fig, use_container_width=True)
+                    # Accumulate if you want historic data
+                    st.session_state.latest_df = pd.concat([st.session_state.latest_df, df], ignore_index=True)
 
-                    col1, col2 = st.columns(2)
+                    with placeholder.container():
+                        st.subheader("🔍 Real-Time Histogram")
+                        fig = px.histogram(df, x="Layer", color="Layer", title="Live Predicted Layers", nbins=3)
+                        st.plotly_chart(fig, use_container_width=True)
 
-                    with col1:
+                        col1, col2 = st.columns(2)
                         fig_l0 = px.histogram(df, x="x1", color="Layer", title="dE_L0 Distribution", nbins=30)
-                        st.plotly_chart(fig_l0, use_container_width=True)
-
-                    with col2:
                         fig_l1 = px.histogram(df, x="x2", color="Layer", title="dE_L1 Distribution", nbins=30)
-                        st.plotly_chart(fig_l1, use_container_width=True)
+                        with col1:
+                            st.plotly_chart(fig_l0, use_container_width=True)
+                        with col2:
+                            st.plotly_chart(fig_l1, use_container_width=True)
 
-                    fig_tot = px.histogram(df, x="x3", color="Layer", title="dE_Tot Distribution", nbins=30)
-                    st.plotly_chart(fig_tot, use_container_width=True)
+                        fig_tot = px.histogram(df, x="x3", color="Layer", title="dE_Tot Distribution", nbins=30)
+                        st.plotly_chart(fig_tot, use_container_width=True)
+                except Exception as e:
+                    st.error(f"WebSocket Error: {e}")
+            await asyncio.sleep(1)
 
-        except FileNotFoundError:
-            st.warning("Waiting for data from randomEnergy generator...")
+# Async Streamlit wrapper
+async def main():
+    await listen_to_websocket()
 
-    else:
-        st.info("Live updates are paused.")
-
-    time.sleep(1)
+# Run the async main loop
+asyncio.run(main())

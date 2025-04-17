@@ -1,56 +1,47 @@
-# backend for batch mode processing
+# backend for batch mode processing with websocket
 
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import joblib
-import numpy as np
 import logging
 import pandas as pd
-from typing import List
+import json
 
 app = FastAPI()
 
-# Add CORS middleware to allow requests from any origin (use specific domains in production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],           # Allow any origin (frontend) to talk to the backend.. Set specific domains in production
-    # allow_origins=["http://localhost:3000"],  # Allow only localhost for development
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],           # Allow all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],           # Allow all headers (e.g., JSON)
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Load your model
 model = joblib.load("./models/best_hgb_model.joblib")
 
-# Setup basic logging config_
 logging.basicConfig(level=logging.INFO)
 
-if model:
-    logging.info("Model loaded successfully.")
-else:
-    logging.error("Failed to load the model.")
+@app.websocket("/ws/predict")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    logging.info("WebSocket connection accepted")
 
-class InputData(BaseModel):
-    x1: float
-    x2: float
-    x3: float
+    try:
+        while True:
+            data = await websocket.receive_text()
+            batch = json.loads(data)
 
-class InputBatch(BaseModel):
-    data: List[InputData]
+            df = pd.DataFrame(batch)
+            df["x3"] = df["x1"] + df["x2"]
+            df.columns = ["dE_L0", "dE_L1", "dE_Tot"]
+            predictions = model.predict(df)
 
-@app.post("/predict_batch")
-def predict_batch(batch: InputBatch):
-    df = pd.DataFrame([{
-        "dE_L0": item.x1,
-        "dE_L1": item.x2,
-        "dE_Tot": item.x3
-    } for item in batch.data])
+            result = df.copy()
+            result["prediction"] = predictions.tolist()
 
-    logging.info(f"Received batch of size: {len(df)}")
+            await websocket.send_text(result.to_json(orient="records"))
 
-    predictions = model.predict(df)
-    logging.info(f"Batch predictions: {predictions.tolist()}")
+    except Exception as e:
+        logging.error(f"WebSocket error: {e}")
+        await websocket.close()
 
-    return {"predictions": predictions.tolist()}
