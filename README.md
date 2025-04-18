@@ -7,8 +7,8 @@ Basic Run Procedure:
 
 -> Inside lisa_reactionLayer_detection_ML/
 	
-	>> python3 -m venv venvName				# if you're using a virtual environment, use the venvName of your choice
-	>> source venvName/bin/activate  			
+	>> python3 -m venv lisa				# if you're using a virtual environment, use the venvName of your choice
+	>> source lisa/bin/activate  			
 	>> pip install -r requirements.txt
 	>> pip list								# confirm list of installed packages
     >> uvicorn backend:app --reload
