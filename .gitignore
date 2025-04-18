@@ -11,6 +11,9 @@ lisa/
 venv/
 env/
 .venv/
+python
+python3
+
 
 # Jupyter Notebook checkpoints (if any)
 .ipynb_checkpoints
@@ -69,3 +72,6 @@ dist/
 # FastAPI/uvicorn reload temp
 **/__pycache__/
 **/*.pyc
+
+# JSON files
+*.json

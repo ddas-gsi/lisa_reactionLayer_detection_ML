@@ -12,11 +12,16 @@ def generate_random_sample():
     dE_Tot = dE_L0 + dE_L1
     return {"x1": dE_L0, "x2": dE_L1, "x3": dE_Tot}
 
+count = 1
+
 while True:
     batch = [generate_random_sample() for _ in range(100)]
     try:
         response = requests.post(BACKEND_URL, json={"data": batch})
         result = response.json()
+
+        print(f"BatchNO: {count}")
+        count = count+1
 
         # Save batch with predictions to file (or database, Redis, etc.)
         with open("latest_batch.json", "w") as f:
