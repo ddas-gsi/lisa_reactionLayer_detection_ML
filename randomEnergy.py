@@ -3,6 +3,7 @@
 import requests
 import random
 import time
+import os
 
 BACKEND_URL = "http://localhost:8000/predict_batch"
 
@@ -26,11 +27,12 @@ while True:
         count = count+1
 
         # Save batch with predictions to file (or database, Redis, etc.)
-        with open("latest_batch.json", "w") as f:
+        with open("latest_batch.tmp", "w") as f:
             import json
             for i, sample in enumerate(batch):
                 sample["prediction"] = result["predictions"][i]
             json.dump(batch, f)
+        os.replace("latest_batch.tmp", "latest_batch.json")
     except Exception as e:
         print("Error:", e)
     
