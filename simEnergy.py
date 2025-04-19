@@ -35,4 +35,4 @@ while True:
     except Exception as e:
         print("Error:", e)
     
-    time.sleep(2)  # Wait 2 second before generating the next batch
+    time.sleep(1)  # Wait 2 second before generating the next batch
