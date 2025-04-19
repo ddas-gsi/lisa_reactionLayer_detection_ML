@@ -6,6 +6,9 @@ import time
 import os
 
 BACKEND_URL = "http://localhost:8000/predict_batch"
+# BACKEND_URL = "http://<IP-Address-Backend>:8000/predict_batch"
+
+
 
 def generate_random_sample():
     dE_L0 = random.uniform(910.0, 1025.0)    # random.uniform(lowerLimit, upperLimit)

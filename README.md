@@ -18,6 +18,11 @@ or if noraml streamlit doesn't work:
 
 	>> python -m streamlit run dashboard.py
 
+For internet wide communication:
+
+    >> uvicorn backend:app --host 0.0.0.0 --port 8000      # or your preferable port number
+
+
 Once done:
 
 	>> deactivate
