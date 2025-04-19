@@ -37,20 +37,20 @@ while True:
                 with placeholder.container():
                     st.subheader("Live Histogram of Predicted Layers")
                     fig = px.histogram(df, x="Layer", color="Layer", nbins=3, title="Layer Distribution (Updated every second)")
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, use_container_width=True, key="main_hist")
 
                     col1, col2 = st.columns(2)
 
                     with col1:
                         fig_l0 = px.histogram(df, x="x1", color="Layer", title="dE_L0 Distribution", nbins=30)
-                        st.plotly_chart(fig_l0, use_container_width=True)
+                        st.plotly_chart(fig_l0, use_container_width=True, key="hist_l0")
 
                     with col2:
                         fig_l1 = px.histogram(df, x="x2", color="Layer", title="dE_L1 Distribution", nbins=30)
-                        st.plotly_chart(fig_l1, use_container_width=True)
+                        st.plotly_chart(fig_l1, use_container_width=True, key="hist_l1")
 
                     fig_tot = px.histogram(df, x="x3", color="Layer", title="dE_Tot Distribution", nbins=30)
-                    st.plotly_chart(fig_tot, use_container_width=True)
+                    st.plotly_chart(fig_tot, use_container_width=True, key="hist_tot")
 
         except FileNotFoundError:
             st.warning("Waiting for data from randomEnergy generator...")
@@ -58,4 +58,4 @@ while True:
     else:
         st.info("Live updates are paused.")
 
-    time.sleep(1)
+    time.sleep(3)
