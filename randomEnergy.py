@@ -5,8 +5,10 @@ import random
 import time
 import os
 
-BACKEND_URL = "http://localhost:8000/predict_batch"
+# BACKEND_URL = "http://localhost:8000/predict_batch"
 # BACKEND_URL = "http://<IP-Address-Backend>:8000/predict_batch"
+# BACKEND_URL = "https://6be9-80-187-102-204.ngrok-free.app/predict_batch"
+BACKEND_URL = "https://4ed0-140-181-90-85.ngrok-free.app/predict_batch"    # ngrok tunnel for backend
 
 
 

@@ -22,10 +22,15 @@ For internet wide communication:
 
     >> uvicorn backend:app --host 0.0.0.0 --port 8000      # or your preferable port number
 
-
 Once done:
 
 	>> deactivate
+
+If using ngrok:
+
+	>> ngrok http http://localhost:8000
+
+Then replace the url in randomEnergy.py with the ngrok endoints
 
 
 Docker Run procedure:
