@@ -22,6 +22,11 @@ For internet wide communication:
 
     >> uvicorn backend:app --host 0.0.0.0 --port 8000      # or your preferable port number
 
+To open dashboard in other computer in same network 
+	
+	>> streamlit run dashboard_v2.py --server.address 0.0.0.0
+
+
 Once done:
 
 	>> deactivate

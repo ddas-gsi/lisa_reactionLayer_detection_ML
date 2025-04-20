@@ -6,7 +6,8 @@ import numpy as np
 import time
 import os
 
-BACKEND_URL = "http://localhost:8000/predict_batch"
+# BACKEND_URL = "http://localhost:8000/predict_batch"
+BACKEND_URL = "https://56ea-140-181-90-85.ngrok-free.app/predict_batch"
 
 def simulateEnergy():
     dE_L0 = np.random.normal(loc=977.74488, scale=18.02573)    # random.normal(loc=0.0, scale=1.0, size=None)
