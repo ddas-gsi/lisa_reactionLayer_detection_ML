@@ -33,6 +33,18 @@ If using ngrok:
 Then replace the url in randomEnergy.py with the ngrok endoints
 
 
+If using `conda`:
+then either:
+	>> conda create -n lisa python=3.11
+	>> conda activate lisa
+	>> pip install -r requirements.txt
+	>> conda deactivate
+or:
+	>> conda env create -f environment.yml
+	>> conda activate lisa
+	
+
+
 Docker Run procedure:
 
 -> Inside lisa_reactionLayer_detection_ML/

@@ -1,0 +1,18 @@
+name: lisa
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy=1.26.4
+  - scikit-learn=1.2.2
+  - imbalanced-learn=0.11.0
+  - joblib=1.2.0
+  - plotly=5.9.0
+  - matplotlib=3.3.4
+  - pip
+  - pip:
+      - fastapi
+      - uvicorn
+      - streamlit
+      - requests
