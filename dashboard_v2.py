@@ -74,12 +74,22 @@ while True:
                 st.subheader("📊 Live Energy Distributions (Updates every second)")
                 col1, col2 = st.columns(2)
                 with col1:
-                    fig_l0 = px.histogram(df, x="x1", color="Layer", title="dE_L0 Distribution", nbins=100)
+                    fig_l0 = px.histogram(
+                        df, x="x1", color="Layer", nbins=100, 
+                        title="dE_L0 Distribution",
+                        # category_orders={"Layer": layer_order},
+                        labels={"Layer": "Reaction Layer"}
+                        )
                     fig_l0.update_layout(xaxis_range=[750, 1200])
                     st.plotly_chart(fig_l0, use_container_width=True, key=f"hist_l0_{update_counter}")
 
                 with col2:
-                    fig_l1 = px.histogram(df, x="x2", color="Layer", title="dE_L1 Distribution", nbins=100)
+                    fig_l1 = px.histogram(
+                        df, x="x2", color="Layer", nbins=100,
+                        title="dE_L1 Distribution",                  
+                        # category_orders={"Layer": layer_order},
+                        labels={"Layer": "Reaction Layer"}
+                        )
                     fig_l1.update_layout(xaxis_range=[750, 1200])
                     st.plotly_chart(fig_l1, use_container_width=True, key=f"hist_l1_{update_counter}")
 
@@ -94,20 +104,35 @@ while True:
                 st.subheader("📊 Cumulative Energy Distributions")
                 col3, col4 = st.columns(2)
                 with col3:
-                    fig_cum_l0 = px.histogram(all_data, x="x1", color="Layer", title="Cumulative dE_L0 Distribution", nbins=500, range_x=[750, 1200])
+                    fig_cum_l0 = px.histogram(
+                        all_data, x="x1", color="Layer", nbins=500, range_x=[750, 1200],
+                        title="Cumulative dE_L0 Distribution",
+                        # category_orders={"Layer": layer_order},
+                        labels={"Layer": "Reaction Layer"}
+                        )
                     st.plotly_chart(fig_cum_l0, use_container_width=True, key=f"cum_l0_{update_counter}")
 
                 with col4:
-                    fig_cum_l1 = px.histogram(all_data, x="x2", color="Layer", title="Cumulative dE_L1 Distribution", nbins=500, range_x=[750, 1200])
+                    fig_cum_l1 = px.histogram(
+                        all_data, x="x2", color="Layer", nbins=500, range_x=[750, 1200],
+                        title="Cumulative dE_L1 Distribution",
+                        # category_orders={"Layer": layer_order},
+                        labels={"Layer": "Reaction Layer"}
+                        )
                     st.plotly_chart(fig_cum_l1, use_container_width=True, key=f"cum_l1_{update_counter}")
 
-                fig_cum_tot = px.histogram(all_data, x="x3", color="Layer", title="Cumulative dE_Tot Distribution", nbins=500, range_x=[1500, 2500])
+                fig_cum_tot = px.histogram(
+                    all_data, x="x3", color="Layer", title="Cumulative dE_Tot Distribution", 
+                    nbins=500, range_x=[1500, 2500],
+                    # category_orders={"Layer": layer_order},
+                    labels={"Layer": "Reaction Layer"}
+                    )
                 st.plotly_chart(fig_cum_tot, use_container_width=True, key=f"cum_tot_{update_counter}")
 
             update_counter += 1
 
         except (FileNotFoundError, json.decoder.JSONDecodeError):
-            st.warning("Waiting for valid data from randomEnergy generator...")
+            st.warning("Waiting for valid data from Energy generator...")
 
     else:
         st.info("Live updates are paused.")
